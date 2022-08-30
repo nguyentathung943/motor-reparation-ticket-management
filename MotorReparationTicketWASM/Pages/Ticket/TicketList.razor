@@ -1,0 +1,48 @@
+﻿@page "/tickets"
+@inject NavigationManager _navigationManager
+
+<table class="table table-dark">
+  <thead>
+    <tr>
+      <th scope="col">Id</th>
+      <th scope="col">Title</th>
+      <th scope="col">Description</th>
+      <th scope="col">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+  @foreach(var Ticket in Tickets)
+  {
+    <tr>
+      <th scope="row">@Ticket.ID</th>
+      <td>@Ticket.Title</td>
+      <td>@Ticket.Description</td>
+      <td>@Ticket.TicketStatus</td>
+      <td>
+        <button type="button" class="btn btn-primary">Edit</button>
+        <button type="button" class="btn btn-danger">Delete</button>
+      </td>
+    </tr>
+  }
+  </tbody>
+</table>
+
+@code {
+  private IEnumerable<TicketDTO> Tickets { get; set; } = new List<TicketDTO> { };
+
+  protected override Task OnInitializedAsync()
+  {
+    return base.OnInitializedAsync();
+  }
+
+
+  private void onDeleteTicketButtonClicked(int ticketId)
+  {
+    
+  }
+
+  private void onEditTicketButtonClicked(int ticketId)
+  {
+    _navigationManager.NavigateTo($"/tickets/{ticketId}");
+  }
+}
