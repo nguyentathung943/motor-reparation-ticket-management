@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Common;
 
 namespace DataAccess.Entity
@@ -6,7 +7,8 @@ namespace DataAccess.Entity
     public class Ticket
     {
         [Key]
-        public int ID { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
 
         [Required]
         public string Title { get; set; }
@@ -19,7 +21,7 @@ namespace DataAccess.Entity
         public int UserId { get; set; }
 
         [Required]
-        public TicketStatus TicketStatus { get; set; }
+        public string TicketStatus { get; set; }
         
         public virtual ICollection<WorkItem> WorkItems { get; set; }
     }

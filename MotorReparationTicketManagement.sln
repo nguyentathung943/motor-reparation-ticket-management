@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32804.467
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MotorReparationTicketWASM", "MotorReparationTicketWASM\MotorReparationTicketWASM.csproj", "{85DBDE1C-F461-452E-92E0-9F5268E73E87}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MotorReparationTicketWASM", "MotorReparationTicketWASM\MotorReparationTicketWASM.csproj", "{85DBDE1C-F461-452E-92E0-9F5268E73E87}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MotorReparationTicketAPI", "MotorReparationTicketAPI\MotorReparationTicketAPI.csproj", "{29AF5B0A-9542-429D-8562-09E166B44983}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MotorReparationTicketAPI", "MotorReparationTicketAPI\MotorReparationTicketAPI.csproj", "{29AF5B0A-9542-429D-8562-09E166B44983}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{F8BFBE7B-9739-4425-AA75-4EC163D7DDFB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csproj", "{F8BFBE7B-9739-4425-AA75-4EC163D7DDFB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess.csproj", "{C5EED781-6444-4865-93B8-39A77C4F60DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccess", "DataAccess\DataAccess.csproj", "{C5EED781-6444-4865-93B8-39A77C4F60DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataModel", "DataModel\DataModel.csproj", "{DE7B5955-177D-47DD-AB8D-5AE01FD353AC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataModel", "DataModel\DataModel.csproj", "{DE7B5955-177D-47DD-AB8D-5AE01FD353AC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,6 +1,6 @@
 ﻿namespace Common;
-public enum WorkItemType
+public static class WorkItemType
 {
-    Labor,
-    Part
+    public static string Labor = "LABOR";
+    public static string Part = "PART";
 }

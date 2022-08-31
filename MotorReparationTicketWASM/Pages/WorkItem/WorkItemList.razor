@@ -1,18 +1,17 @@
-﻿@page "/tickets"
+﻿@page "/ticket/{ticketId:int}/items"
 @using MotorReparationTicketWASM.Service.IService
 @inject NavigationManager _navigationManager
 @inject ITicketHttpService TicketHttpService;
 
-@if (Tickets.Any())
+@if (TicketWorkItems.Any())
 {
-	<table class="table table-primary">
+@*	<table class="table table-primary">
 		<thead>
 		<tr>
 			<th scope="col">Id</th>
 			<th scope="col">Title</th>
 			<th scope="col">Description</th>
 			<th scope="col">Status</th>
-			<th scope="col">Owner</th>
 			<th scope="col">Methods</th>
 		</tr>
 		</thead>
@@ -24,7 +23,6 @@
 				<td>@Ticket.Title</td>
 				<td>@Ticket.Description</td>
 				<td>@Ticket.TicketStatus</td>
-				<td>@Ticket.CreatedByUser</td>
 				<td>
 					<button type="button" class="btn btn-primary">Edit</button>
 					<button type="button" class="btn btn-danger">Delete</button>
@@ -33,33 +31,37 @@
 			</tr>
 		}
 		</tbody>
-	</table>
+	</table>*@
 }
 else
 {
 	<div class="text-info">
-		No Tickets Available
+		No Work Item Available for ticket with ID @ticketId
 	</div>
 }
 
-<button type="button" class="btn btn-primary">Add Ticket</button>
+<button type="button" class="btn btn-primary">Add Work Item for ticket with ID @ticketId</button>
 
 @code {
-  private List<TicketDTO> Tickets { get; set; } = new List<TicketDTO> { };
 
-  protected async override Task OnInitializedAsync()
-  {
-	  Tickets = await TicketHttpService.GetAllTickets();
-  }
+	[Parameter]
+	private int ticketId { get; set;} 
+
+	private List<TicketWorkItemDTO> TicketWorkItems { get; set; } = new List<TicketWorkItemDTO> { };
+
+	protected async override Task OnInitializedAsync()
+	{
+
+	}
 
 
-  private void onDeleteTicketButtonClicked(int ticketId)
-  {
+	private void onDeleteTicketButtonClicked(int ticketId)
+	{
 	  
-  }
+	}
 
-  private void onEditTicketButtonClicked(int ticketId)
-  {
-    _navigationManager.NavigateTo($"/tickets/{ticketId}");
-  }
+	private void onEditTicketButtonClicked(int ticketId)
+	{
+		_navigationManager.NavigateTo($"/tickets/{ticketId}");
+	}
 }

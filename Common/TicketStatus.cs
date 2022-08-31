@@ -1,7 +1,7 @@
 ﻿namespace Common;
-public enum TicketStatus
+public static class TicketStatus
 {
-    Todo,
-    InProgress,
-    WorkDone
+    public static string Todo = "TODO";
+    public static string InProgress = "IN PROGRESS";
+    public static string WorkDone = "WORK DONE";
 }

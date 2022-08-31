@@ -7,14 +7,15 @@ namespace DataAccess.Entity;
 public class WorkItem
 {
     [Key]
-    public int ID { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
     
     public int TicketId { get; set; }
     [ForeignKey("TicketId")]
     public Ticket Ticket { get; set; }
     
     [Required]
-    public WorkItemType WorkItemType { get; set; }
+    public string WorkItemType { get; set; }
     
     [Required]
     public double UnitPrice { get; set; }
