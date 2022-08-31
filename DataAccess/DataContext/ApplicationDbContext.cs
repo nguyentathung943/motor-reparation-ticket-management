@@ -9,6 +9,6 @@ public class ApplicationDbContext: IdentityDbContext<ApplicationUser>
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     { }
 
-    private DbSet<Ticket> Tickets { get; set; }
-    private DbSet<WorkItem> TicketWorkItems { get; set; }
+    public DbSet<Ticket> Tickets { get; set; }
+    public DbSet<WorkItem> TicketWorkItems { get; set; }
 }
