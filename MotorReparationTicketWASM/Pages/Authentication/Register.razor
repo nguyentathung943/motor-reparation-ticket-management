@@ -1,5 +1,72 @@
-﻿<h3>Register</h3>
+﻿@page "/register"
+@using DataModel.Authentication
+@inject IAuthenticationService AuthenticationService
+@inject NavigationManager NavigationManager
+@inject IToastService ToastService
+
+<h3>REGISTER</h3>
+
+<EditForm Model="RegisterCredentials" OnValidSubmit="onFormSubmitHandler">
+    <DataAnnotationsValidator />
+    <ValidationSummary/>
+    <div class="form-group">
+        <label>Email</label>
+        <InputText @bind-Value="RegisterCredentials.Email" class="form-control"></InputText>
+        <ValidationMessage For="() => RegisterCredentials.Email"></ValidationMessage>
+    </div>
+
+    <div class="form-group">
+        <label>Password</label>
+        <InputText type="password" @bind-Value="RegisterCredentials.Password" class="form-control"></InputText>
+        <ValidationMessage For="() => RegisterCredentials.Password"></ValidationMessage>
+    </div>
+    
+    <div class="form-group">
+        <label>Comfirm Password</label>
+        <InputText type="password" @bind-Value="RegisterCredentials.ConfirmPassword" class="form-control"></InputText>
+        <ValidationMessage For="() => RegisterCredentials.ConfirmPassword"></ValidationMessage>
+    </div>
+
+    <div class="form-group mt-4">
+        <button class="btn btn-primary">Register</button>
+        <NavLink href="/login" class="btn btn-secondary">Back to login page</NavLink>
+    </div>
+</EditForm>
+
+@foreach (var error in ErrorList)
+{
+    <p style="color:red">@error</p>
+}
 
 @code {
-    
+    RegisterDTO RegisterCredentials = new RegisterDTO() { };
+    private bool IsError { get; set; } = false;
+    private IEnumerable<string> ErrorList = new List<string>();
+
+    public async Task onFormSubmitHandler()
+    {
+        ErrorList = new List<string>();
+        IsError = false;
+
+        try
+        {
+            var registerResponseDTO = await AuthenticationService.RegisterUser(RegisterCredentials);
+            if (registerResponseDTO.IsRegisterationSuccessful)
+            {
+
+                NavigationManager.NavigateTo("/login");
+                ToastService.ShowSuccess("User Registered Successfully");
+            }
+            else
+            {
+                ErrorList = registerResponseDTO.Errors;
+                IsError = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowSuccess("Fail To Register");
+            ToastService.ShowSuccess(ex.Message);
+        }
+    }
 }

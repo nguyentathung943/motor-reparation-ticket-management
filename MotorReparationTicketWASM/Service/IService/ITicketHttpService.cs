@@ -6,8 +6,8 @@ namespace MotorReparationTicketWASM.Service.IService
     {
         Task<List<TicketDTO>> GetAllTickets();
         Task<TicketDTO> GetTicketById(int ticketId);
-        Task<int> CreateTicket(TicketCreateUpdateDTO ticketModel);
-        Task<int> UpdateTicket(int ticketId, TicketCreateUpdateDTO ticketModel);
-        Task<int> DeleteTicket(int ticketId);
+        Task<bool> CreateTicket(TicketCreateUpdateDTO ticketModel);
+        Task<bool> UpdateTicket(int ticketId, TicketCreateUpdateDTO ticketModel);
+        Task<bool> DeleteTicket(int ticketId);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using DataModel;
 using MotorReparationTicketWASM.Service.IService;
+using System.Text;
 using System.Text.Json;
 
 namespace MotorReparationTicketWASM.Service
@@ -22,28 +23,72 @@ namespace MotorReparationTicketWASM.Service
             {
                 throw new ApplicationException(content);
             }
-            var products = JsonSerializer.Deserialize<List<TicketDTO>>(content, _options);
-            return products;
+            var ticketList = JsonSerializer.Deserialize<List<TicketDTO>>(content, _options);
+            return ticketList;
         }
 
         public async Task<TicketDTO> GetTicketById(int ticketId)
         {
-            throw new NotImplementedException();
+            var response = await _client.GetAsync($"api/tickets/{ticketId}");
+            var content = await response.Content.ReadAsStringAsync();
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new ApplicationException(content);
+            }
+            var ticket = JsonSerializer.Deserialize<TicketDTO>(content, _options);
+            return ticket;
         }
 
-        public async Task<int> CreateTicket(TicketCreateUpdateDTO ticketModel)
+        private StringContent ConvertDTOToBodyStringContent<T>(T model)
         {
-            throw new NotImplementedException();
+            var json = JsonSerializer.Serialize<T>(model);
+            var stringContent = new StringContent(json, UnicodeEncoding.UTF8, "application/json");
+            return stringContent;
         }
 
-        public async Task<int> UpdateTicket(int ticketId, TicketCreateUpdateDTO ticketModel)
+        public async Task<bool> CreateTicket(TicketCreateUpdateDTO ticketModel)
         {
-            throw new NotImplementedException();
+            ticketModel.UserId = 2;
+
+            var stringBodyContent = ConvertDTOToBodyStringContent(ticketModel);
+
+            var response = await _client.PostAsync("api/tickets", stringBodyContent);
+            var content = await response.Content.ReadAsStringAsync();
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new ApplicationException(content);
+            }
+
+            var isTicketCreated = JsonSerializer.Deserialize<int>(content, _options);
+            return isTicketCreated == 1;
         }
 
-        public async Task<int> DeleteTicket(int ticketId)
+        public async Task<bool> UpdateTicket(int ticketId, TicketCreateUpdateDTO ticketModel)
         {
-            throw new NotImplementedException();
+            var stringBodyContent = ConvertDTOToBodyStringContent(ticketModel);
+
+            var response = await _client.PutAsync($"api/tickets/{ticketId}", stringBodyContent);
+            var content = await response.Content.ReadAsStringAsync();
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new ApplicationException(content);
+            }
+
+            var isTicketUpdated = JsonSerializer.Deserialize<int>(content, _options);
+            return isTicketUpdated == 1;
+        }
+
+        public async Task<bool> DeleteTicket(int ticketId)
+        {
+            var response = await _client.DeleteAsync($"api/tickets/{ticketId}");
+            var content = await response.Content.ReadAsStringAsync();
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new ApplicationException(content);
+            }
+
+            var isTicketDeleted = JsonSerializer.Deserialize<int>(content, _options);
+            return isTicketDeleted == 1;
         }
     }
 }

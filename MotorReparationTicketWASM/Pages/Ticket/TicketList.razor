@@ -1,7 +1,10 @@
 ﻿@page "/tickets"
-@using MotorReparationTicketWASM.Service.IService
 @inject NavigationManager _navigationManager
-@inject ITicketHttpService TicketHttpService;
+@inject ITicketHttpService TicketHttpService
+@inject IToastService toastService
+@attribute [Authorize]
+
+<h3> TICKET LIST </h3>
 
 @if (Tickets.Any())
 {
@@ -26,9 +29,9 @@
 				<td>@Ticket.TicketStatus</td>
 				<td>@Ticket.CreatedByUser</td>
 				<td>
-					<button type="button" class="btn btn-primary">Edit</button>
-					<button type="button" class="btn btn-danger">Delete</button>
-					<button type="button" class="btn btn-info">View Work Items</button>
+					<button type="button" class="btn btn-primary" @onclick="() => onEditTicketButtonClicked(Ticket.Id.Value)">Edit</button>
+					<button type="button" class="btn btn-danger" @onclick="() => onDeleteTicketButtonClicked(Ticket.Id.Value)">Delete</button>
+					<button type="button" class="btn btn-info" @onclick="() => onViewItemsButtonClicked(Ticket.Id.Value)">View Work Items</button>
 				</td>
 			</tr>
 		}
@@ -42,24 +45,48 @@ else
 	</div>
 }
 
-<button type="button" class="btn btn-primary">Add Ticket</button>
+<button type="button" class="btn btn-primary" @onclick="() => onAddTicketButtonClicked()">Add Ticket</button>
 
 @code {
-  private List<TicketDTO> Tickets { get; set; } = new List<TicketDTO> { };
+	private List<TicketDTO> Tickets { get; set; } = new List<TicketDTO> { };
 
-  protected async override Task OnInitializedAsync()
-  {
-	  Tickets = await TicketHttpService.GetAllTickets();
-  }
+	protected async override Task OnInitializedAsync()
+	{
+	    try
+	    {
+	        Tickets = await TicketHttpService.GetAllTickets();
+	    }
+	    catch (Exception ex)
+	    {
+	        toastService.ShowError(ex.Message);
+	    } 
+	}
 
+	private async Task onAddTicketButtonClicked()
+	{
+		_navigationManager.NavigateTo($"/tickets/create");
+	}
 
-  private void onDeleteTicketButtonClicked(int ticketId)
-  {
-	  
-  }
+	private async Task onDeleteTicketButtonClicked(int ticketId)
+	{
+		try {
+			await TicketHttpService.DeleteTicket(ticketId);
+			Tickets = await TicketHttpService.GetAllTickets();
+			toastService.ShowInfo("Ticket deleted successfully");
+        }
+        catch (Exception ex) {
+            toastService.ShowError("Fail to Delete Ticket");
+            toastService.ShowError(ex.Message);
+        }
+	}
 
-  private void onEditTicketButtonClicked(int ticketId)
-  {
-    _navigationManager.NavigateTo($"/tickets/{ticketId}");
-  }
+	private async Task onEditTicketButtonClicked(int ticketId)
+	{
+		_navigationManager.NavigateTo($"/tickets/edit/{ticketId}");
+	}
+
+	private async Task onViewItemsButtonClicked(int ticketId)
+	{
+		_navigationManager.NavigateTo($"/tickets/{ticketId}/items");
+	}
 }

@@ -1,0 +1,119 @@
+﻿@page "/tickets/{ticketId:int}/items/create"
+@page "/tickets/{ticketId:int}/items/edit/{itemId:int}"
+@inject IToastService toastService
+@inject NavigationManager NavigationManager
+@inject IWorkItemHttpService TicketWorkItemService
+@attribute [Authorize]
+
+<h3> @Title A TICKET </h3>
+
+<div class="row mt-2 mb-5">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <EditForm Model="ItemModel" OnValidSubmit="HandleOnSubmitForm">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary/>
+
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <InputNumber @bind-Value="ItemModel.Quantity" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => ItemModel.Quantity"></ValidationMessage>
+                    </div>
+                    <div class="form-group">
+                        <label>Unit Price</label>
+                        <InputNumber @bind-Value="ItemModel.UnitPrice" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => ItemModel.UnitPrice"></ValidationMessage>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ticket Status</label>
+                        <select @bind="ItemModel.WorkItemType" class="form-control">
+                            <option value="@WorkItemType.Labor">Labor</option>
+                            <option value="@WorkItemType.Part">Part</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mt-4">
+                        <button class="btn btn-primary">@Title Work Item Ticket</button>
+                        <NavLink @onclick="() => OnBackToWorkItemListButtonClicked()" class="btn btn-secondary">Back to Item List</NavLink>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public int? itemId { get; set; }
+
+    [Parameter]
+    public int? ticketId { get; set; }
+
+    private string Title { get; set; }
+
+    private bool isInCreateMode { get; set; }
+
+
+    private TicketWorkItemCreateUpdateDTO ItemModel = new TicketWorkItemCreateUpdateDTO()
+    {
+        WorkItemType = WorkItemType.Labor,
+    };
+
+
+    protected override void OnInitialized()
+    {
+        isInCreateMode = itemId == null ? true : false;
+        Title = isInCreateMode ? "Create" : "Update";
+        ItemModel.TicketId = ticketId.Value;
+    }
+
+    protected override async Task OnInitializedAsync(){
+        try {
+            if (!isInCreateMode) {
+                TicketWorkItemDTO itemDTO = await TicketWorkItemService.GetTicketWorkItemById(itemId.Value);
+
+                if (itemDTO.TicketId != ticketId.Value) {
+                    throw new ApplicationException($"Item ID {itemId} was not found for ticket ID {ticketId.Value}");
+                }
+
+                ItemModel = new TicketWorkItemCreateUpdateDTO()
+                {
+                        TicketId = itemDTO.TicketId,
+                        WorkItemType = itemDTO.WorkItemType,
+                        UnitPrice = itemDTO.UnitPrice,
+                        Quantity = itemDTO.Quantity
+                };
+            }
+        }
+        catch (Exception ex) {
+            toastService.ShowError("No Work Item Was Found");
+            NavigationManager.NavigateTo("/tickets");
+        }
+    }
+
+    private async Task HandleOnSubmitForm() {
+        try {
+            var isActionCompleted = isInCreateMode
+                ? await TicketWorkItemService.CreateTicketWorkItem(ItemModel)
+                : await TicketWorkItemService.UpdateTicketWorkItem(itemId.Value, ItemModel);
+
+            if (isActionCompleted)
+            {
+                toastService.ShowInfo($"Ticket Work Item {Title} Successfully!");
+                NavigationManager.NavigateTo($"/tickets/{ticketId.Value}/items");
+            }
+        }
+        catch (Exception ex) {
+            toastService.ShowError($"Fail to {Title} Ticket Work Item");
+            toastService.ShowError(ex.Message);
+        }
+    }
+
+    private async Task OnBackToWorkItemListButtonClicked() {
+        
+        NavigationManager.NavigateTo($"/tickets/{ticketId.Value}/items");
+    }
+}

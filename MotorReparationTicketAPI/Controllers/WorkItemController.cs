@@ -1,10 +1,12 @@
 ﻿using DataModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MotorReparationTicketAPI.Repository.IRepository;
 
 namespace MotorReparationTicketAPI.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/ticket_items")]
 public class WorkItemController: ControllerBase
 {
@@ -18,8 +20,18 @@ public class WorkItemController: ControllerBase
     [HttpGet("get-work-items-by-ticket-id/{ticketId}")]
     public async Task<IActionResult> GetAllWorkItemsByTicketId(int ticketId)
     {
-        var result = await _workItemService.GetAllWorkItemsByTicketId(ticketId);
-        return Ok(result);
+        try
+        {
+            var result = await _workItemService.GetAllWorkItemsByTicketId(ticketId);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new ErrorModel()
+            {
+                ErrorMessage = ex.Message
+            });
+        }
     }
 
     [HttpGet("{itemId}")]
@@ -40,23 +52,33 @@ public class WorkItemController: ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateWorkItem(TicketWorkItemCreateUpdateDTO itemModel)
+    public async Task<IActionResult> CreateWorkItem([FromBody] TicketWorkItemCreateUpdateDTO itemModel)
     {
-        if (!ModelState.IsValid)
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ErrorModel()
+                {
+                    ErrorMessage = "Invalid Data Format",
+                    StatusCode = 500
+                });
+            }
+
+            var result = await _workItemService.CreateWorkItem(itemModel);
+            return Ok(result);
+        }
+        catch (Exception ex)
         {
             return BadRequest(new ErrorModel()
             {
-                ErrorMessage = "Invalid Data Format",
-                StatusCode = 500
+                ErrorMessage = ex.Message
             });
         }
-        
-        var result = await _workItemService.CreateWorkItem(itemModel);
-        return Ok(result);
     }
 
     [HttpPut("{itemId}")]
-    public async Task<IActionResult> UpdateWorkItem(int itemId, TicketWorkItemCreateUpdateDTO itemModel)
+    public async Task<IActionResult> UpdateWorkItem(int itemId,[FromBody] TicketWorkItemCreateUpdateDTO itemModel)
     {
         try
         {

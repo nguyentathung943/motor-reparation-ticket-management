@@ -2,8 +2,12 @@
 
 <PageTitle>Ticket Management Home</PageTitle>
 
-<h1>HI BRO!</h1>
-
-Welcome to Motor Reparation Ticket Management Application
-
-@* <SurveyPrompt Title="How is Blazor working for you?" /> *@
+<AuthorizeView>
+    <Authorized>
+        <h1>HI @context.User.Identity.Name</h1>
+    </Authorized>
+    <NotAuthorized>
+        <h1>HI BRO!</h1>
+        Welcome to Motor Reparation Ticket Management Application. Please Login To View Tickets
+    </NotAuthorized>
+</AuthorizeView>

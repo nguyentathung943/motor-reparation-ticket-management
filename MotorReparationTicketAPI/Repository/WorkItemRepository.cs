@@ -17,6 +17,13 @@ public class WorkItemRepository: IWorkItemRepository
     
     public async Task<IEnumerable<TicketWorkItemDTO>> GetAllWorkItemsByTicketId(int ticketId)
     {
+        var ticket = await _db.Tickets.FindAsync(ticketId); 
+
+        if (ticket == null)
+        {
+            throw new Exception($"No ticket was found with ID: {ticketId}");
+        }
+
         var result =
         (
             from item in _db.TicketWorkItems

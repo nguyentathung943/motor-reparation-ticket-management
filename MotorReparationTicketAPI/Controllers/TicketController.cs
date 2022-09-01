@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using DataModel;
 using MotorReparationTicketAPI.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MotorReparationTicketAPI.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/tickets")]
 public class TicketController: ControllerBase
 {
@@ -18,8 +20,18 @@ public class TicketController: ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllTickets()
     {
-        var result = await _ticketService.GetAllTickets();
-        return Ok(result);
+        try
+        {
+            var result = await _ticketService.GetAllTickets();
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new ErrorModel()
+            {
+                ErrorMessage = ex.Message
+            });
+        }
     }
     
     [HttpGet("{ticketId}")]
@@ -42,18 +54,28 @@ public class TicketController: ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateTicket([FromBody] TicketCreateUpdateDTO ticketModel)
     {
-        if (!ModelState.IsValid)
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ErrorModel()
+                {
+                    ErrorMessage = "Wrong Data Format",
+                    StatusCode = 500,
+                    Title = "Error"
+                });
+            }
+
+            var result = await _ticketService.CreateTicket(ticketModel);
+            return Ok(result);
+        }
+        catch (Exception ex)
         {
             return BadRequest(new ErrorModel()
             {
-                ErrorMessage = "Wrong Data Format",
-                StatusCode = 500,
-                Title = "Error"
+                ErrorMessage = ex.Message
             });
         }
-        
-        var result = await _ticketService.CreateTicket(ticketModel);
-        return Ok(result);
     }
 
     [HttpPut("{ticketId}")]

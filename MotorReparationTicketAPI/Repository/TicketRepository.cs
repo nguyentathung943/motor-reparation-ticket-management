@@ -105,7 +105,10 @@ public class TicketRepository: ITicketRepository
         {
             throw new Exception($"No ticket was found with ID: {ticketId}");
         }
-        
+
+        var workItems = await _db.TicketWorkItems.Where(x => x.TicketId == ticketId).ToListAsync();
+
+        _db.TicketWorkItems.RemoveRange(workItems);
         _db.Tickets.Remove(ticket);
         return await _db.SaveChangesAsync();
     }

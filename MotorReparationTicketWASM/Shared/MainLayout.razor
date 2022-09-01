@@ -7,11 +7,20 @@
 
     <main>
         <div class="top-row px-4">
-            <a href="#">LOGIN</a>
-            <a href="#">LOGOUT</a>
+            <AuthorizeView>
+                <NotAuthorized>
+                    <a href="/login">LOGIN</a>
+                    <a href="/register">REGISTER</a>
+                </NotAuthorized>
+                <Authorized>
+                    <a> HELLO @context.User.Identity.Name</a>
+                    <a href="/logout">LOGOUT</a>
+                </Authorized>
+            </AuthorizeView>
         </div>
 
         <article class="content px-4">
+            <BlazoredToasts />
             @Body
         </article>
     </main>

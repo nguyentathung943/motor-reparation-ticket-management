@@ -1,67 +1,91 @@
-﻿@page "/ticket/{ticketId:int}/items"
-@using MotorReparationTicketWASM.Service.IService
-@inject NavigationManager _navigationManager
-@inject ITicketHttpService TicketHttpService;
+﻿@page "/tickets/{ticketId:int}/items"
 
-@if (TicketWorkItems.Any())
+@inject NavigationManager NavigationManager
+@inject IWorkItemHttpService WorkItemService
+@inject IToastService toastService
+@attribute [Authorize]
+
+<h3> WORK ITEM FOR TICKET ID: @ticketId </h3>
+
+@if (TicketItems.Any())
 {
-@*	<table class="table table-primary">
+	<table class="table table-primary">
 		<thead>
-		<tr>
-			<th scope="col">Id</th>
-			<th scope="col">Title</th>
-			<th scope="col">Description</th>
-			<th scope="col">Status</th>
-			<th scope="col">Methods</th>
-		</tr>
+			<tr>
+				<th scope="col">Id</th>
+				<th scope="col">Quantity/Hours</th>
+				<th scope="col">Price/Labor Rate</th>
+				<th scope="col">Work Item Type</th>
+				<th scope="col">Created By</th>
+				<th scope="col">Methods</th>
+			</tr>
 		</thead>
 		<tbody>
-		@foreach(var Ticket in Tickets)
-		{
-			<tr>
-				<th scope="row">@Ticket.Id</th>
-				<td>@Ticket.Title</td>
-				<td>@Ticket.Description</td>
-				<td>@Ticket.TicketStatus</td>
-				<td>
-					<button type="button" class="btn btn-primary">Edit</button>
-					<button type="button" class="btn btn-danger">Delete</button>
-					<button type="button" class="btn btn-info">View Work Items</button>
-				</td>
-			</tr>
-		}
+			@foreach (var Items in TicketItems)
+			{
+				<tr>
+					<th scope="row">@Items.Id</th>
+					<td>@Items.Quantity</td>
+					<td>@Items.UnitPrice</td>
+					<td>@Items.WorkItemType</td>
+					<td>@Items.CreatedByUser</td>
+					<td>
+						<button type="button" class="btn btn-primary" @onclick="() => onEditItemButtonClicked(Items.Id.Value)">Edit</button>
+						<button type="button" class="btn btn-danger" @onclick="() => onDeleteItemButtonClicked(Items.Id.Value)">Delete</button>
+					</td>
+				</tr>
+			}
 		</tbody>
-	</table>*@
+	</table>
 }
 else
 {
 	<div class="text-info">
-		No Work Item Available for ticket with ID @ticketId
+		No Work Item Available For Ticket ID @ticketId
 	</div>
 }
 
-<button type="button" class="btn btn-primary">Add Work Item for ticket with ID @ticketId</button>
+<button type="button" class="btn btn-primary" @onclick="() => onAddItemButtonClicked()">Add Work Items</button>
+<NavLink type="button" class="btn btn-primary" href="/tickets">Back To Ticket List</NavLink>
 
 @code {
-
 	[Parameter]
-	private int ticketId { get; set;} 
+	public int ticketId { get; set; }
 
-	private List<TicketWorkItemDTO> TicketWorkItems { get; set; } = new List<TicketWorkItemDTO> { };
+	private List<TicketWorkItemDTO> TicketItems { get; set; } = new List<TicketWorkItemDTO> {};
 
 	protected async override Task OnInitializedAsync()
 	{
-
+		try {
+			TicketItems = await WorkItemService.GetAllWorkItemByTicketId(ticketId);
+		}
+		catch(Exception ex) {
+			toastService.ShowError(ex.Message);
+			NavigationManager.NavigateTo("/tickets");
+		}
 	}
 
-
-	private void onDeleteTicketButtonClicked(int ticketId)
+	private async Task onAddItemButtonClicked()
 	{
-	  
+		NavigationManager.NavigateTo($"/tickets/{ticketId}/items/create");
 	}
 
-	private void onEditTicketButtonClicked(int ticketId)
+	private async Task onDeleteItemButtonClicked(int itemId)
 	{
-		_navigationManager.NavigateTo($"/tickets/{ticketId}");
+		try
+		{
+			await WorkItemService.DeleteTicketWorkItem(itemId);
+			TicketItems = await WorkItemService.GetAllWorkItemByTicketId(ticketId);
+			toastService.ShowInfo("Ticket Work Item deleted successfully");
+		}
+		catch (Exception ex)
+		{
+			toastService.ShowError(ex.Message);
+		}
+	}
+
+	private async Task onEditItemButtonClicked(int itemId)
+	{
+		NavigationManager.NavigateTo($"/tickets/{ticketId}/items/edit/{itemId}");
 	}
 }
