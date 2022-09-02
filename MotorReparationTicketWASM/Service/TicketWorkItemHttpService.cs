@@ -1,4 +1,7 @@
-﻿using DataModel;
+﻿using Blazored.LocalStorage;
+using Common;
+using DataModel;
+using DataModel.Authentication;
 using MotorReparationTicketWASM.Service.IService;
 using System.Text;
 using System.Text.Json;
@@ -9,10 +12,14 @@ namespace MotorReparationTicketWASM.Service
     {
         private readonly HttpClient _client;
         private readonly JsonSerializerOptions _options;
-        public TicketWorkItemHttpService(HttpClient client)
+        private readonly ILocalStorageService _localStorageService;
+
+
+        public TicketWorkItemHttpService(HttpClient client, ILocalStorageService localStorageService)
         {
             _client = client;
             _options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            _localStorageService = localStorageService;
         }
 
         private StringContent ConvertDTOToBodyStringContent<T>(T model)
@@ -48,7 +55,8 @@ namespace MotorReparationTicketWASM.Service
 
         public async Task<bool> CreateTicketWorkItem(TicketWorkItemCreateUpdateDTO itemModel)
 		{
-            itemModel.UserId = 2;
+            var userInfo = await _localStorageService.GetItemAsync<UserInfoDTO>(Auth.USER_DETAIL);
+            itemModel.UserId = userInfo.Id;
 
             var stringBodyContent = ConvertDTOToBodyStringContent(itemModel);
 

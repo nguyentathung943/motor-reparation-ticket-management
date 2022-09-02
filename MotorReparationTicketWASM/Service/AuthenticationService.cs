@@ -35,10 +35,7 @@ namespace MotorReparationTicketWASM.Service
 
                 return new RegisterResponseDTO() { IsRegisterationSuccessful = true };
             }
-            else
-            {
-                return result;
-            }
+            return result;
         }
 
         public async Task<LoginResponseDTO> Login(LoginDTO loginDTO)
@@ -58,10 +55,7 @@ namespace MotorReparationTicketWASM.Service
                 _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.Token);
                 return new LoginResponseDTO { IsAuthSuccessful = true };
             }
-            else
-            {
-                return result;
-            }
+            return result;
         }
 
         public async Task LogOut()

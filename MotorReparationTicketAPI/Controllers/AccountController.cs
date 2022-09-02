@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using DataModel;
 
 namespace MotorReparationTicketAPI.Controllers
 {
@@ -41,7 +42,21 @@ namespace MotorReparationTicketAPI.Controllers
         {
             if (registerDTO == null || !ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest(new RegisterResponseDTO()
+                {
+                    IsRegisterationSuccessful = false,
+                    Errors = new List<string>() {"Invalid Data Type"}
+                });
+            }
+
+            var userDb = await _userManager.FindByEmailAsync(registerDTO.Email);
+            if (userDb != null)
+            {
+                return BadRequest(new RegisterResponseDTO()
+                {
+                    IsRegisterationSuccessful = false,
+                    Errors = new List<string>() { "Email already taken, please get another one!" }
+                });
             }
 
             var user = new ApplicationUser()
